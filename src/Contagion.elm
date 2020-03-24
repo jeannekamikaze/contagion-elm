@@ -155,10 +155,10 @@ type alias Position = (Int, Int)
 newGrid : Width -> Height -> Grid
 newGrid width height = makeArray2 width height healthyCell
 
-randomizeGrid : PRNG -> Grid -> Grid
-randomizeGrid prng grid =
+randomizeGrid : Seed -> Grid -> Grid
+randomizeGrid seed grid =
   let randomize (row, col) cell = { cell | prng = cellPRNG row col }
-      cellPRNG row col = newPRNG (modBy 876290 (row + 18793123) * modBy 107762 (col + 1998772))
+      cellPRNG row col = newPRNG (modBy 876290 (seed * (row + 18793123) * modBy 107762 (col + 1998772)))
   in indexedMap2 randomize grid
 
 type alias AnimationSpeed = Int
@@ -183,7 +183,7 @@ newGame speed width height =
 seedGame : Seed -> Patient -> GameState -> GameState
 seedGame seed patientZero game =
   { game
-  | grid = modify2 makeSick patientZero (randomizeGrid (newPRNG (seed + 17622107)) game.grid)
+  | grid = modify2 makeSick patientZero (randomizeGrid (seed + 17622107) game.grid)
   , prng = newPRNG (seed + 8162397)
   }
 
